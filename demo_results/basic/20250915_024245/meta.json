@@ -1,0 +1,21 @@
+{
+  "version": "1.0.0",
+  "git_hash": "unknown",
+  "timestamp": "20250915_024245",
+  "config": {
+    "train_path": "demo_data/train.csv",
+    "test_path": "demo_data/test.csv",
+    "target": "target",
+    "time_col": null,
+    "n_jobs": 1,
+    "time_budget": 300,
+    "audit_cli": null,
+    "seed": 42,
+    "verbose": true,
+    "stability_runs": 5,
+    "calibration": "none",
+    "risk_policy": null
+  },
+  "pipeline_time": 1.2050769329071045,
+  "model_card_path": "demo_results/basic/20250915_024245/model_card.html"
+}

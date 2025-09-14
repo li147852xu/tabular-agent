@@ -10,6 +10,11 @@ from pathlib import Path
 import pydantic
 from pydantic import BaseModel, Field, field_validator
 
+# Import for type hints only
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .kb.index import KnowledgeBase
+
 
 class PlannerMode(str, Enum):
     """Planner execution modes."""
