@@ -1,0 +1,32 @@
+# Model blending strategy configurations
+
+mean_blending:
+  class: "MeanBlender"
+  default_params:
+    weights: null  # null means equal weights
+
+rank_mean_blending:
+  class: "RankMeanBlender"
+  default_params:
+    weights: null
+
+logit_mean_blending:
+  class: "LogitMeanBlender"
+  default_params:
+    weights: null
+    epsilon: 1e-15
+
+stacking_blending:
+  class: "StackingBlender"
+  default_params:
+    meta_learner: null  # null means auto-select
+    cv_folds: 5
+    random_state: 42
+
+ensemble_blending:
+  class: "BlendingEnsemble"
+  default_params:
+    strategies: ["mean", "rank_mean", "logit_mean"]
+    weights: null
+    cv_folds: 5
+    random_state: 42

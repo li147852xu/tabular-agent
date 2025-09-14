@@ -1,0 +1,22 @@
+# Feature engineering encoder configurations
+
+target_encoder:
+  smoothing: 1.0
+  min_samples_leaf: 1
+  cv_folds: 5
+
+woe_encoder:
+  min_samples_leaf: 1
+
+rolling_encoder:
+  window_sizes: [7, 14, 30]
+  functions: ["mean", "std", "min", "max"]
+
+time_aware_encoder:
+  encoders: ["target", "woe"]
+  cv_folds: 5
+
+feature_selector:
+  min_variance: 0.01
+  max_correlation: 0.95
+  min_iv: 0.02

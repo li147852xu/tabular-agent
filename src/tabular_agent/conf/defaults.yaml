@@ -1,0 +1,73 @@
+# Default configuration for tabular-agent
+
+# Data settings
+target: "target"
+time_col: null
+n_jobs: 1
+seed: 42
+verbose: false
+
+# Model settings
+model_names: ["lightgbm", "xgboost", "catboost"]
+cv_folds: 5
+time_budget: 300
+
+# Feature engineering settings
+feature_config:
+  encoders: ["target", "woe"]
+  cv_folds: 5
+  rolling_features: true
+  window_sizes: [7, 14, 30]
+  rolling_functions: ["mean", "std", "min", "max"]
+  feature_selection: true
+  min_variance: 0.01
+  max_correlation: 0.95
+  min_iv: 0.02
+  scaling: true
+
+# Model-specific settings
+lightgbm:
+  n_estimators: 100
+  learning_rate: 0.1
+  max_depth: 6
+  num_leaves: 31
+  subsample: 0.8
+  colsample_bytree: 0.8
+  random_state: 42
+  verbose: -1
+
+xgboost:
+  n_estimators: 100
+  learning_rate: 0.1
+  max_depth: 6
+  subsample: 0.8
+  colsample_bytree: 0.8
+  random_state: 42
+  verbosity: 0
+
+catboost:
+  iterations: 100
+  learning_rate: 0.1
+  depth: 6
+  subsample: 0.8
+  colsample_bylevel: 0.8
+  random_seed: 42
+  verbose: false
+
+# Blending settings
+blending:
+  strategies: ["mean", "rank_mean", "logit_mean"]
+  weights: null  # null means equal weights
+
+# Evaluation settings
+evaluation:
+  threshold_optimization: true
+  calibration_analysis: true
+  stability_analysis: true
+  n_bins: 10
+
+# Report settings
+report:
+  include_plots: true
+  plot_format: "html"
+  save_plots: true

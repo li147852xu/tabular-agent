@@ -1,0 +1,2 @@
+[console_scripts]
+tabular-agent = tabular_agent.cli.run:main

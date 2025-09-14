@@ -1,0 +1,82 @@
+# Model registry configuration
+
+models:
+  lightgbm:
+    class: "LightGBMModel"
+    default_params:
+      n_estimators: 100
+      learning_rate: 0.1
+      max_depth: 6
+      num_leaves: 31
+      subsample: 0.8
+      colsample_bytree: 0.8
+      random_state: 42
+      verbose: -1
+    param_spaces:
+      n_estimators: [50, 1000]
+      learning_rate: [0.01, 0.3]
+      max_depth: [3, 12]
+      num_leaves: [10, 100]
+      subsample: [0.6, 1.0]
+      colsample_bytree: [0.6, 1.0]
+      reg_alpha: [0.0, 1.0]
+      reg_lambda: [0.0, 1.0]
+
+  xgboost:
+    class: "XGBoostModel"
+    default_params:
+      n_estimators: 100
+      learning_rate: 0.1
+      max_depth: 6
+      subsample: 0.8
+      colsample_bytree: 0.8
+      random_state: 42
+      verbosity: 0
+    param_spaces:
+      n_estimators: [50, 1000]
+      learning_rate: [0.01, 0.3]
+      max_depth: [3, 12]
+      subsample: [0.6, 1.0]
+      colsample_bytree: [0.6, 1.0]
+      reg_alpha: [0.0, 1.0]
+      reg_lambda: [0.0, 1.0]
+
+  catboost:
+    class: "CatBoostModel"
+    default_params:
+      iterations: 100
+      learning_rate: 0.1
+      depth: 6
+      subsample: 0.8
+      colsample_bylevel: 0.8
+      random_seed: 42
+      verbose: false
+    param_spaces:
+      iterations: [50, 1000]
+      learning_rate: [0.01, 0.3]
+      depth: [3, 12]
+      subsample: [0.6, 1.0]
+      colsample_bylevel: [0.6, 1.0]
+      l2_leaf_reg: [1.0, 10.0]
+
+  linear:
+    class: "LinearModel"
+    default_params:
+      random_state: 42
+    param_spaces:
+      C: [0.001, 100.0]
+      penalty: ["l1", "l2", "elasticnet"]
+      solver: ["liblinear", "lbfgs", "saga"]
+
+  histgbdt:
+    class: "HistGBDTModel"
+    default_params:
+      max_iter: 100
+      learning_rate: 0.1
+      max_depth: 6
+      random_state: 42
+    param_spaces:
+      max_iter: [50, 1000]
+      learning_rate: [0.01, 0.3]
+      max_depth: [3, 12]
+      l2_regularization: [0.0, 1.0]
