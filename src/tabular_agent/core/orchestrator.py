@@ -16,8 +16,10 @@ from .models.trainers import ModelTrainer, EnsembleTrainer
 from .tune.optuna import OptunaTuner, MultiModelTuner
 from .blend.basic import BlendingEnsemble
 from .evaluate.metrics import MetricsCalculator, CalibrationAnalyzer, ThresholdOptimizer, StabilityAnalyzer
+from .evaluate.stability import StabilityEvaluator
 from .report.card import ModelCardGenerator
 from ..agent import Planner, PlanningConfig, KnowledgeBase
+from ..agent.reflector import Reflector, ReflectorConfig
 
 
 class PipelineOrchestrator:
@@ -49,6 +51,16 @@ class PipelineOrchestrator:
         self.knowledge_base = KnowledgeBase()
         self.planner = Planner(self.planner_config, self.knowledge_base)
         self.planning_result = None
+        
+        # Initialize Reflector
+        self.reflector_config = ReflectorConfig(
+            stability_runs=config.get('stability_runs', 5),
+            risk_policy_path=config.get('risk_policy')
+        )
+        self.reflector = Reflector(self.reflector_config)
+        self.stability_evaluator = StabilityEvaluator(
+            n_runs=config.get('stability_runs', 5)
+        )
         
         # Initialize components
         self.data_profiler = None
@@ -143,10 +155,25 @@ class PipelineOrchestrator:
                 model_results, y_train, X_test, test_df[self.config['target']]
             )
             
+            # Step 5.5: Stability evaluation
+            print("Step 5.5: Stability evaluation...")
+            stability_results = self._evaluate_stability(
+                X_train, y_train, X_test, test_df[self.config['target']], evaluation_results
+            )
+            
+            # Step 5.6: Risk analysis
+            print("Step 5.6: Risk analysis...")
+            risk_analysis = self._analyze_risks(
+                evaluation_results, stability_results, audit_results
+            )
+            
             # Step 6: Generate model card
             print("Step 6: Generating model card...")
             model_card_path = self._generate_model_card(
-                evaluation_results, train_metadata, audit_results, output_dir, self.planning_result
+                evaluation_results, train_metadata, audit_results, output_dir,
+                planning_result=self.planning_result, 
+                stability_results=stability_results, 
+                risk_analysis=risk_analysis
             )
             
             # Compile results
@@ -364,7 +391,9 @@ class PipelineOrchestrator:
         train_metadata: Dict[str, Any], 
         audit_results: Dict[str, Any], 
         output_dir: Path,
-        planning_result: Optional[Dict[str, Any]] = None
+        planning_result: Optional[Dict[str, Any]] = None,
+        stability_results: Optional[Dict[str, Any]] = None,
+        risk_analysis: Optional[Dict[str, Any]] = None
     ) -> str:
         """Generate model card."""
         # Get best model
@@ -385,7 +414,6 @@ class PipelineOrchestrator:
             audit_results=audit_results,
             feature_importance=feature_importance,
             calibration_results=best_results['calibration'],
-            stability_results=best_results['stability'],
             metadata={
                 'best_model': best_model,
                 'target': self.config['target'],
@@ -394,7 +422,9 @@ class PipelineOrchestrator:
                 'time_budget': self.config.get('time_budget', 300),
                 'seed': self.config.get('seed', 42)
             },
-            planning_result=planning_result.dict() if planning_result else None
+            planning_result=planning_result.dict() if planning_result else None,
+            stability_results=stability_results,
+            risk_analysis=risk_analysis
         )
         
         return model_card_path
@@ -419,3 +449,61 @@ class PipelineOrchestrator:
                 best_model = model_name
         
         return best_model or list(evaluation_results.keys())[0]
+    
+    def _evaluate_stability(
+        self,
+        X_train: pd.DataFrame,
+        y_train: pd.Series,
+        X_test: pd.DataFrame,
+        y_test: pd.Series,
+        evaluation_results: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Evaluate model stability across multiple runs."""
+        # Get best model configuration
+        best_model_name = self._get_best_model(evaluation_results)
+        best_model_config = evaluation_results[best_model_name].get('config', {})
+        
+        # Get feature importance from best model
+        feature_importance = evaluation_results[best_model_name].get('feature_importance', {})
+        
+        # Run stability evaluation
+        stability_results = self.stability_evaluator.evaluate_stability(
+            X_train, y_train, X_test, y_test, best_model_config, 
+            feature_importance=feature_importance,
+            n_jobs=self.config.get('n_jobs', 1)
+        )
+        
+        return stability_results
+    
+    def _analyze_risks(
+        self,
+        evaluation_results: Dict[str, Any],
+        stability_results: Dict[str, Any],
+        audit_results: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Analyze risks using Reflector."""
+        # Get best model results
+        best_model_name = self._get_best_model(evaluation_results)
+        best_model_results = evaluation_results[best_model_name]
+        
+        # Analyze risks
+        risks = self.reflector.analyze_risks(
+            model_results=best_model_results,
+            stability_results=stability_results,
+            calibration_results=best_model_results.get('calibration', {}),
+            audit_results=audit_results
+        )
+        
+        # Generate retry suggestions
+        retry_suggestions = self.reflector.generate_retry_suggestions(risks)
+        
+        return {
+            'risks': [risk.__dict__ for risk in risks],
+            'retry_suggestions': retry_suggestions,
+            'risk_summary': {
+                'total_risks': len(risks),
+                'high_risks': len([r for r in risks if r.level.value == 'high']),
+                'medium_risks': len([r for r in risks if r.level.value == 'medium']),
+                'low_risks': len([r for r in risks if r.level.value == 'low'])
+            }
+        }

@@ -40,6 +40,9 @@ def cli():
 @click.option("--planner", default="auto", type=click.Choice(["llm", "rules", "auto"]), help="Planner mode")
 @click.option("--llm-endpoint", help="LLM endpoint URL")
 @click.option("--llm-key", help="LLM API key")
+@click.option("--stability-runs", default=5, type=int, help="Number of stability evaluation runs")
+@click.option("--calibration", default="isotonic", type=click.Choice(["isotonic", "platt", "none"]), help="Calibration method")
+@click.option("--risk-policy", help="Path to risk policy YAML file")
 def run(
     train: str,
     test: str,
@@ -55,6 +58,9 @@ def run(
     planner: str,
     llm_endpoint: Optional[str],
     llm_key: Optional[str],
+    stability_runs: int,
+    calibration: str,
+    risk_policy: Optional[str],
 ) -> None:
     """Run tabular-agent pipeline from CSV to model card report."""
     try:
@@ -81,6 +87,9 @@ def run(
             "audit_cli": audit_cli,
             "seed": seed,
             "verbose": verbose,
+            "stability_runs": stability_runs,
+            "calibration": calibration,
+            "risk_policy": risk_policy,
         })
         
         # Initialize and run orchestrator

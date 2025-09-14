@@ -1,0 +1,615 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Card - Tabular Agent</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #007bff;
+            margin: 0;
+            font-size: 2.5em;
+        }
+        .header p {
+            color: #666;
+            margin: 10px 0 0 0;
+            font-size: 1.1em;
+        }
+        .section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        .section h2 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .metric-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .metric-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        .plot-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .feature-item {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .feature-name {
+            font-weight: bold;
+            color: #333;
+        }
+        .feature-importance {
+            color: #007bff;
+            font-size: 0.9em;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            color: #666;
+        }
+        
+        /* Risk Analysis Styles */
+        .risk-matrix {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+            justify-content: center;
+        }
+        .risk-item {
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            min-width: 120px;
+        }
+        .risk-item.high-risk {
+            background-color: #ffebee;
+            border: 2px solid #f44336;
+        }
+        .risk-item.medium-risk {
+            background-color: #fff3e0;
+            border: 2px solid #ff9800;
+        }
+        .risk-item.low-risk {
+            background-color: #e8f5e8;
+            border: 2px solid #4caf50;
+        }
+        .risk-count {
+            display: block;
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .risk-label {
+            font-size: 0.9em;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .risk-card {
+            margin: 15px 0;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid;
+        }
+        .risk-card.high {
+            background-color: #ffebee;
+            border-left-color: #f44336;
+        }
+        .risk-card.medium {
+            background-color: #fff3e0;
+            border-left-color: #ff9800;
+        }
+        .risk-card.low {
+            background-color: #e8f5e8;
+            border-left-color: #4caf50;
+        }
+        .risk-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .risk-level {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .risk-level.high {
+            background-color: #f44336;
+            color: white;
+        }
+        .risk-level.medium {
+            background-color: #ff9800;
+            color: white;
+        }
+        .risk-level.low {
+            background-color: #4caf50;
+            color: white;
+        }
+        .risk-evidence, .risk-suggestions {
+            margin: 15px 0;
+        }
+        .risk-evidence ul, .risk-suggestions ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .suggestion-card {
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+        .suggestion-card.high {
+            background-color: #ffebee;
+            border-color: #f44336;
+        }
+        .suggestion-card.medium {
+            background-color: #fff3e0;
+            border-color: #ff9800;
+        }
+        .suggestion-card.low {
+            background-color: #e8f5e8;
+            border-color: #4caf50;
+        }
+        .suggestion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .suggestion-priority {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .suggestion-priority.high {
+            background-color: #f44336;
+            color: white;
+        }
+        .suggestion-priority.medium {
+            background-color: #ff9800;
+            color: white;
+        }
+        .suggestion-priority.low {
+            background-color: #4caf50;
+            color: white;
+        }
+        .stability-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .metric-card {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .metric-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .metric-value.grade-A { color: #4caf50; }
+        .metric-value.grade-B { color: #8bc34a; }
+        .metric-value.grade-C { color: #ff9800; }
+        .metric-value.grade-D { color: #ff5722; }
+        .metric-value.grade-F { color: #f44336; }
+        .metric-label {
+            font-size: 0.9em;
+            color: #666;
+        }
+        .stability-summary {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Model Card</h1>
+            <p>Generated by Tabular Agent v0.3.0 on 2025-09-14 16:13:30</p>
+        </div>
+
+        <!-- Model Performance -->
+        <div class="section">
+            <h2>Model Performance</h2>
+            <div class="metrics-grid">
+                
+                <div class="metric-card">
+                    <div class="metric-value">0.959</div>
+                    <div class="metric-label">AUC</div>
+                </div>
+                
+                
+                <div class="metric-card">
+                    <div class="metric-value">0.860</div>
+                    <div class="metric-label">Accuracy</div>
+                </div>
+                
+                
+                <div class="metric-card">
+                    <div class="metric-value">0.878</div>
+                    <div class="metric-label">Precision</div>
+                </div>
+                
+                
+                <div class="metric-card">
+                    <div class="metric-value">0.800</div>
+                    <div class="metric-label">Recall</div>
+                </div>
+                
+                
+                <div class="metric-card">
+                    <div class="metric-value">0.837</div>
+                    <div class="metric-label">F1 Score</div>
+                </div>
+                
+            </div>
+            
+            
+            <div class="plot-container">
+                <div>                            <div id="8c8d4964-e81d-49ea-a995-766319a65011" class="plotly-graph-div" style="height:400px; width:500px;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("8c8d4964-e81d-49ea-a995-766319a65011")) {                    Plotly.newPlot(                        "8c8d4964-e81d-49ea-a995-766319a65011",                        [{"line":{"color":"blue","width":2},"mode":"lines","name":"ROC Curve","x":[0.0,0.0,0.0,0.00909090909090909,0.00909090909090909,0.01818181818181818,0.01818181818181818,0.02727272727272727,0.02727272727272727,0.045454545454545456,0.045454545454545456,0.05454545454545454,0.05454545454545454,0.06363636363636363,0.06363636363636363,0.07272727272727272,0.07272727272727272,0.09090909090909091,0.09090909090909091,0.1,0.1,0.14545454545454545,0.14545454545454545,0.17272727272727273,0.17272727272727273,0.2,0.2,0.23636363636363636,0.23636363636363636,0.24545454545454545,0.24545454545454545,0.2909090909090909,0.2909090909090909,0.35454545454545455,0.35454545454545455,0.36363636363636365,0.36363636363636365,1.0],"y":[0.0,0.011111111111111112,0.6222222222222222,0.6222222222222222,0.6333333333333333,0.6333333333333333,0.6444444444444445,0.6444444444444445,0.7111111111111111,0.7111111111111111,0.7555555555555555,0.7555555555555555,0.7666666666666667,0.7666666666666667,0.7777777777777778,0.7777777777777778,0.8,0.8,0.8222222222222222,0.8222222222222222,0.9,0.9,0.9222222222222223,0.9222222222222223,0.9333333333333333,0.9333333333333333,0.9444444444444444,0.9444444444444444,0.9555555555555556,0.9555555555555556,0.9666666666666667,0.9666666666666667,0.9777777777777777,0.9777777777777777,0.9888888888888889,0.9888888888888889,1.0,1.0],"type":"scatter"},{"line":{"color":"red","dash":"dash"},"mode":"lines","name":"Random Classifier","x":[0,1],"y":[0,1],"type":"scatter"}],                        {"height":400,"template":{"data":{"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmapgl":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmapgl"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"geo":{"bgcolor":"white","lakecolor":"white","landcolor":"#E5ECF6","showlakes":true,"showland":true,"subunitcolor":"white"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"light"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"bgcolor":"#E5ECF6","radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"ternary":{"aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"bgcolor":"#E5ECF6","caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"title":{"x":0.05},"xaxis":{"automargin":true,"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","zerolinewidth":2}}},"title":{"text":"ROC Curve"},"width":500,"xaxis":{"title":{"text":"False Positive Rate"}},"yaxis":{"title":{"text":"True Positive Rate"}}},                        {"responsive": true}                    )                };                            </script>        </div>
+            </div>
+            
+            
+            
+            <div class="plot-container">
+                <div>                            <div id="390a1d08-30f1-4baa-8008-6440c75033be" class="plotly-graph-div" style="height:400px; width:500px;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("390a1d08-30f1-4baa-8008-6440c75033be")) {                    Plotly.newPlot(                        "390a1d08-30f1-4baa-8008-6440c75033be",                        [{"line":{"color":"green","width":2},"mode":"lines","name":"PR Curve","x":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.9888888888888889,0.9888888888888889,0.9777777777777777,0.9777777777777777,0.9777777777777777,0.9777777777777777,0.9777777777777777,0.9777777777777777,0.9777777777777777,0.9777777777777777,0.9666666666666667,0.9666666666666667,0.9666666666666667,0.9666666666666667,0.9666666666666667,0.9666666666666667,0.9555555555555556,0.9555555555555556,0.9444444444444444,0.9444444444444444,0.9444444444444444,0.9444444444444444,0.9444444444444444,0.9333333333333333,0.9333333333333333,0.9333333333333333,0.9333333333333333,0.9222222222222223,0.9222222222222223,0.9222222222222223,0.9222222222222223,0.9111111111111111,0.9,0.9,0.9,0.9,0.9,0.9,0.8888888888888888,0.8777777777777778,0.8666666666666667,0.8555555555555555,0.8444444444444444,0.8333333333333334,0.8222222222222222,0.8222222222222222,0.8111111111111111,0.8,0.8,0.8,0.7888888888888889,0.7777777777777778,0.7777777777777778,0.7666666666666667,0.7666666666666667,0.7555555555555555,0.7555555555555555,0.7444444444444445,0.7333333333333333,0.7222222222222222,0.7111111111111111,0.7111111111111111,0.7111111111111111,0.7,0.6888888888888889,0.6777777777777778,0.6666666666666666,0.6555555555555556,0.6444444444444445,0.6444444444444445,0.6333333333333333,0.6333333333333333,0.6222222222222222,0.6222222222222222,0.6111111111111112,0.6,0.5888888888888889,0.5777777777777777,0.5666666666666667,0.5555555555555556,0.5444444444444444,0.5333333333333333,0.5222222222222223,0.5111111111111111,0.5,0.4888888888888889,0.4777777777777778,0.4666666666666667,0.45555555555555555,0.4444444444444444,0.43333333333333335,0.4222222222222222,0.4111111111111111,0.4,0.3888888888888889,0.37777777777777777,0.36666666666666664,0.35555555555555557,0.34444444444444444,0.3333333333333333,0.32222222222222224,0.3111111111111111,0.3,0.28888888888888886,0.2777777777777778,0.26666666666666666,0.25555555555555554,0.24444444444444444,0.23333333333333334,0.2222222222222222,0.2111111111111111,0.2,0.18888888888888888,0.17777777777777778,0.16666666666666666,0.15555555555555556,0.14444444444444443,0.13333333333333333,0.12222222222222222,0.1111111111111111,0.1,0.08888888888888889,0.07777777777777778,0.06666666666666667,0.05555555555555555,0.044444444444444446,0.03333333333333333,0.022222222222222223,0.011111111111111112,0.0],"y":[0.45,0.45226130653266333,0.45454545454545453,0.45685279187817257,0.45918367346938777,0.46153846153846156,0.4639175257731959,0.46632124352331605,0.46875,0.4712041884816754,0.47368421052631576,0.47619047619047616,0.4787234042553192,0.48128342245989303,0.4838709677419355,0.4864864864864865,0.4891304347826087,0.4918032786885246,0.4945054945054945,0.4972375690607735,0.5,0.5027932960893855,0.5056179775280899,0.5084745762711864,0.5113636363636364,0.5142857142857142,0.5172413793103449,0.5202312138728323,0.5232558139534884,0.5263157894736842,0.5294117647058824,0.5325443786982249,0.5357142857142857,0.5389221556886228,0.5421686746987951,0.5454545454545454,0.5487804878048781,0.5521472392638037,0.5555555555555556,0.5590062111801242,0.5625,0.5660377358490566,0.569620253164557,0.5732484076433121,0.5769230769230769,0.5806451612903226,0.5844155844155844,0.5882352941176471,0.5921052631578947,0.5960264900662252,0.6,0.6040268456375839,0.6081081081081081,0.6122448979591837,0.6164383561643836,0.6206896551724138,0.625,0.6293706293706294,0.6338028169014085,0.6382978723404256,0.6428571428571429,0.6474820143884892,0.6521739130434783,0.656934306569343,0.6617647058823529,0.6666666666666666,0.6716417910447762,0.6766917293233082,0.6818181818181818,0.6870229007633588,0.6923076923076923,0.689922480620155,0.6953125,0.6929133858267716,0.6984126984126984,0.704,0.7096774193548387,0.7154471544715447,0.7213114754098361,0.7272727272727273,0.7333333333333333,0.7310924369747899,0.7372881355932204,0.7435897435897436,0.75,0.7565217391304347,0.7631578947368421,0.7610619469026548,0.7678571428571429,0.7657657657657657,0.7727272727272727,0.7798165137614679,0.7870370370370371,0.794392523364486,0.7924528301886793,0.8,0.8076923076923077,0.8155339805825242,0.8137254901960784,0.8217821782178217,0.83,0.8383838383838383,0.8367346938775511,0.8350515463917526,0.84375,0.8526315789473684,0.8617021276595744,0.8709677419354839,0.8804347826086957,0.8791208791208791,0.8777777777777778,0.8764044943820225,0.875,0.8735632183908046,0.872093023255814,0.8705882352941177,0.8809523809523809,0.8795180722891566,0.8780487804878049,0.8888888888888888,0.9,0.8987341772151899,0.8974358974358975,0.9090909090909091,0.9078947368421053,0.92,0.918918918918919,0.9315068493150684,0.9305555555555556,0.9295774647887324,0.9285714285714286,0.927536231884058,0.9411764705882353,0.9552238805970149,0.9545454545454546,0.9538461538461539,0.953125,0.9523809523809523,0.9516129032258065,0.9508196721311475,0.9666666666666667,0.9661016949152542,0.9827586206896551,0.9824561403508771,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],"type":"scatter"}],                        {"height":400,"template":{"data":{"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmapgl":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmapgl"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"geo":{"bgcolor":"white","lakecolor":"white","landcolor":"#E5ECF6","showlakes":true,"showland":true,"subunitcolor":"white"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"light"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"bgcolor":"#E5ECF6","radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"ternary":{"aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"bgcolor":"#E5ECF6","caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"title":{"x":0.05},"xaxis":{"automargin":true,"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","zerolinewidth":2}}},"title":{"text":"Precision-Recall Curve"},"width":500,"xaxis":{"title":{"text":"Recall"}},"yaxis":{"title":{"text":"Precision"}}},                        {"responsive": true}                    )                };                            </script>        </div>
+            </div>
+            
+        </div>
+
+        <!-- Data Profile -->
+        <div class="section">
+            <h2>Data Profile</h2>
+            
+            <div class="info">
+                <strong>Dataset Shape:</strong> 800 rows × 22 columns
+            </div>
+            
+            
+            
+            
+            
+            <div class="info">
+                <strong>Data Quality Score:</strong> 100.0/100
+            </div>
+            
+        </div>
+
+        <!-- Planning and Citations -->
+        
+        <div class="section">
+            <h2>Planning and Citations</h2>
+            <div class="planning-info">
+                <h3>Execution Plan</h3>
+                <div class="plan-details">
+                    <p><strong>Planning Mode:</strong> Rules</p>
+                    
+                    
+                    <h4>Feature Engineering Recipes</h4>
+                    <ul>
+                        
+                        <li>Scaling</li>
+                        
+                        <li>Cross Features</li>
+                        
+                    </ul>
+                    
+                    <h4>Model Types</h4>
+                    <ul>
+                        
+                        <li>Lightgbm</li>
+                        
+                        <li>Linear</li>
+                        
+                    </ul>
+                    
+                    <h4>Blending Strategy</h4>
+                    <p>Mean</p>
+                    
+                    
+                    <h4>Time Budget Allocation</h4>
+                    <ul>
+                        
+                        <li>Feature Engineering: 30.0%</li>
+                        
+                        <li>Model Training: 60.0%</li>
+                        
+                        <li>Hyperparameter Tuning: 10.0%</li>
+                        
+                    </ul>
+                    
+                </div>
+                
+                
+            </div>
+        </div>
+        
+
+        <!-- Risk Analysis and Stability -->
+        
+        <div class="section">
+            <h2>Risk Analysis and Stability</h2>
+            
+            <!-- Risk Summary -->
+            <div class="risk-summary">
+                <h3>Risk Summary</h3>
+                <div class="risk-matrix">
+                    <div class="risk-item high-risk">
+                        <span class="risk-count">0</span>
+                        <span class="risk-label">High Risk</span>
+                    </div>
+                    <div class="risk-item medium-risk">
+                        <span class="risk-count">0</span>
+                        <span class="risk-label">Medium Risk</span>
+                    </div>
+                    <div class="risk-item low-risk">
+                        <span class="risk-count">0</span>
+                        <span class="risk-label">Low Risk</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Risk Details -->
+            
+            
+            <!-- Retry Suggestions -->
+            
+            
+            <!-- Stability Dashboard -->
+            
+            <div class="stability-dashboard">
+                <h3>Model Stability Dashboard</h3>
+                <div class="stability-metrics">
+                    <div class="metric-card">
+                        <div class="metric-value">0.000</div>
+                        <div class="metric-label">Mean Score</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">0.000</div>
+                        <div class="metric-label">Std Deviation</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">0.000</div>
+                        <div class="metric-label">CV Coefficient</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value grade-F">F</div>
+                        <div class="metric-label">Stability Grade</div>
+                    </div>
+                </div>
+                <div class="stability-summary">
+                    <p><strong>Overall Assessment:</strong> Very Unstable</p>
+                    <p><strong>Recommendation:</strong> Model is unreliable - significant changes needed</p>
+                    <p><strong>Confidence Interval:</strong> (0.000, 0.000)</p>
+                </div>
+            </div>
+            
+        </div>
+        
+
+        <!-- Leakage Audit -->
+        <div class="section">
+            <h2>Leakage Audit</h2>
+            
+                
+                
+                
+                
+                <div class="success">
+                    <strong>✅ No Obvious Leakage Detected</strong>
+                </div>
+                
+            
+        </div>
+
+        <!-- Feature Importance -->
+        <div class="section">
+            <h2>Feature Importance</h2>
+            
+            
+            
+        </div>
+
+        <!-- Model Calibration -->
+        <div class="section">
+            <h2>Model Calibration</h2>
+            
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">inf</div>
+                    <div class="metric-label">Brier Score</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">inf</div>
+                    <div class="metric-label">Expected Calibration Error</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">inf</div>
+                    <div class="metric-label">Maximum Calibration Error</div>
+                </div>
+            </div>
+            
+            
+            
+        </div>
+
+        <!-- Model Stability -->
+        <div class="section">
+            <h2>Model Stability</h2>
+            
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">0.0000</div>
+                    <div class="metric-label">Population Stability Index</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">0.0000</div>
+                    <div class="metric-label">AUC Standard Deviation</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">0.0000</div>
+                    <div class="metric-label">Positive Rate Std Dev</div>
+                </div>
+            </div>
+            
+            
+            
+        </div>
+
+        <!-- Metadata -->
+        <div class="section">
+            <h2>Model Metadata</h2>
+            <table>
+                <tr>
+                    <th>Property</th>
+                    <th>Value</th>
+                </tr>
+                
+                <tr>
+                    <td>Best_model</td>
+                    <td>xgboost</td>
+                </tr>
+                
+                <tr>
+                    <td>Target</td>
+                    <td>target</td>
+                </tr>
+                
+                <tr>
+                    <td>Time_col</td>
+                    <td>date</td>
+                </tr>
+                
+                <tr>
+                    <td>N_jobs</td>
+                    <td>2</td>
+                </tr>
+                
+                <tr>
+                    <td>Time_budget</td>
+                    <td>30</td>
+                </tr>
+                
+                <tr>
+                    <td>Seed</td>
+                    <td>42</td>
+                </tr>
+                
+            </table>
+        </div>
+
+        <div class="footer">
+            <p>Generated by Tabular Agent v0.3.0 | 2025-09-14 16:13:30</p>
+        </div>
+    </div>
+</body>
+</html>
+        

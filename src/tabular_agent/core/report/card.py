@@ -44,7 +44,8 @@ class ModelCardGenerator:
         calibration_results: Dict[str, Any],
         stability_results: Dict[str, Any],
         metadata: Dict[str, Any],
-        planning_result: Optional[Dict[str, Any]] = None
+        planning_result: Optional[Dict[str, Any]] = None,
+        risk_analysis: Optional[Dict[str, Any]] = None
     ) -> str:
         """
         Generate comprehensive model card.
@@ -69,7 +70,7 @@ class ModelCardGenerator:
         # Prepare data for template
         template_data = self._prepare_template_data(
             model_results, data_profile, audit_results, feature_importance,
-            calibration_results, stability_results, metadata, plots, planning_result
+            calibration_results, stability_results, metadata, plots, planning_result, risk_analysis
         )
         
         # Load and render template
@@ -381,7 +382,8 @@ class ModelCardGenerator:
         stability_results: Dict[str, Any],
         metadata: Dict[str, Any],
         plots: Dict[str, str],
-        planning_result: Optional[Dict[str, Any]] = None
+        planning_result: Optional[Dict[str, Any]] = None,
+        risk_analysis: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """Prepare data for template rendering."""
         return {
@@ -394,8 +396,9 @@ class ModelCardGenerator:
             'metadata': metadata,
             'plots': plots,
             'planning_result': planning_result,
+            'risk_analysis': risk_analysis,
             'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'version': '0.2.0'
+            'version': '0.3.0'
         }
     
     def _load_template(self) -> Template:
@@ -546,6 +549,169 @@ class ModelCardGenerator:
             border-top: 1px solid #e0e0e0;
             color: #666;
         }
+        
+        /* Risk Analysis Styles */
+        .risk-matrix {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+            justify-content: center;
+        }
+        .risk-item {
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            min-width: 120px;
+        }
+        .risk-item.high-risk {
+            background-color: #ffebee;
+            border: 2px solid #f44336;
+        }
+        .risk-item.medium-risk {
+            background-color: #fff3e0;
+            border: 2px solid #ff9800;
+        }
+        .risk-item.low-risk {
+            background-color: #e8f5e8;
+            border: 2px solid #4caf50;
+        }
+        .risk-count {
+            display: block;
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .risk-label {
+            font-size: 0.9em;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .risk-card {
+            margin: 15px 0;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid;
+        }
+        .risk-card.high {
+            background-color: #ffebee;
+            border-left-color: #f44336;
+        }
+        .risk-card.medium {
+            background-color: #fff3e0;
+            border-left-color: #ff9800;
+        }
+        .risk-card.low {
+            background-color: #e8f5e8;
+            border-left-color: #4caf50;
+        }
+        .risk-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .risk-level {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .risk-level.high {
+            background-color: #f44336;
+            color: white;
+        }
+        .risk-level.medium {
+            background-color: #ff9800;
+            color: white;
+        }
+        .risk-level.low {
+            background-color: #4caf50;
+            color: white;
+        }
+        .risk-evidence, .risk-suggestions {
+            margin: 15px 0;
+        }
+        .risk-evidence ul, .risk-suggestions ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .suggestion-card {
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+        .suggestion-card.high {
+            background-color: #ffebee;
+            border-color: #f44336;
+        }
+        .suggestion-card.medium {
+            background-color: #fff3e0;
+            border-color: #ff9800;
+        }
+        .suggestion-card.low {
+            background-color: #e8f5e8;
+            border-color: #4caf50;
+        }
+        .suggestion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .suggestion-priority {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .suggestion-priority.high {
+            background-color: #f44336;
+            color: white;
+        }
+        .suggestion-priority.medium {
+            background-color: #ff9800;
+            color: white;
+        }
+        .suggestion-priority.low {
+            background-color: #4caf50;
+            color: white;
+        }
+        .stability-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .metric-card {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .metric-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .metric-value.grade-A { color: #4caf50; }
+        .metric-value.grade-B { color: #8bc34a; }
+        .metric-value.grade-C { color: #ff9800; }
+        .metric-value.grade-D { color: #ff5722; }
+        .metric-value.grade-F { color: #f44336; }
+        .metric-label {
+            font-size: 0.9em;
+            color: #666;
+        }
+        .stability-summary {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
     </style>
 </head>
 <body>
@@ -685,6 +851,116 @@ class ModelCardGenerator:
                 </div>
                 {% endif %}
             </div>
+        </div>
+        {% endif %}
+
+        <!-- Risk Analysis and Stability -->
+        {% if risk_analysis %}
+        <div class="section">
+            <h2>Risk Analysis and Stability</h2>
+            
+            <!-- Risk Summary -->
+            <div class="risk-summary">
+                <h3>Risk Summary</h3>
+                <div class="risk-matrix">
+                    <div class="risk-item high-risk">
+                        <span class="risk-count">{{ risk_analysis.risk_summary.high_risks }}</span>
+                        <span class="risk-label">High Risk</span>
+                    </div>
+                    <div class="risk-item medium-risk">
+                        <span class="risk-count">{{ risk_analysis.risk_summary.medium_risks }}</span>
+                        <span class="risk-label">Medium Risk</span>
+                    </div>
+                    <div class="risk-item low-risk">
+                        <span class="risk-count">{{ risk_analysis.risk_summary.low_risks }}</span>
+                        <span class="risk-label">Low Risk</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Risk Details -->
+            {% if risk_analysis.risks %}
+            <div class="risk-details">
+                <h3>Risk Details</h3>
+                {% for risk in risk_analysis.risks %}
+                <div class="risk-card {{ risk.level }}">
+                    <div class="risk-header">
+                        <h4>{{ risk.risk_type|replace('_', ' ')|title }}</h4>
+                        <span class="risk-level {{ risk.level }}">{{ risk.level|title }}</span>
+                    </div>
+                    <p class="risk-description">{{ risk.description }}</p>
+                    <div class="risk-evidence">
+                        <strong>Evidence:</strong>
+                        <ul>
+                            {% for key, value in risk.evidence.items() %}
+                            <li><strong>{{ key|replace('_', ' ')|title }}:</strong> {{ value }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="risk-suggestions">
+                        <strong>Suggested Actions:</strong>
+                        <ul>
+                            {% for suggestion in risk.suggestions %}
+                            <li>{{ suggestion|replace('_', ' ')|title }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <!-- Retry Suggestions -->
+            {% if risk_analysis.retry_suggestions.suggestions %}
+            <div class="retry-suggestions">
+                <h3>Retry Suggestions</h3>
+                <div class="suggestions-priority {{ risk_analysis.retry_suggestions.priority }}">
+                    <strong>Priority Level:</strong> {{ risk_analysis.retry_suggestions.priority|title }}
+                </div>
+                {% for suggestion in risk_analysis.retry_suggestions.suggestions %}
+                <div class="suggestion-card {{ suggestion.priority }}">
+                    <div class="suggestion-header">
+                        <h4>{{ suggestion.action|replace('_', ' ')|title }}</h4>
+                        <span class="suggestion-priority {{ suggestion.priority }}">{{ suggestion.priority|title }}</span>
+                    </div>
+                    <p class="suggestion-description">{{ suggestion.description }}</p>
+                    <div class="suggestion-implementation">
+                        <strong>Implementation:</strong> {{ suggestion.implementation }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <!-- Stability Dashboard -->
+            {% if stability_results %}
+            <div class="stability-dashboard">
+                <h3>Model Stability Dashboard</h3>
+                <div class="stability-metrics">
+                    <div class="metric-card">
+                        <div class="metric-value">{{ "%.3f"|format(stability_results.stability_metrics.mean_score) }}</div>
+                        <div class="metric-label">Mean Score</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">{{ "%.3f"|format(stability_results.stability_metrics.std_score) }}</div>
+                        <div class="metric-label">Std Deviation</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">{{ "%.3f"|format(stability_results.stability_metrics.coefficient_of_variation) }}</div>
+                        <div class="metric-label">CV Coefficient</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value grade-{{ stability_results.stability_metrics.stability_grade }}">{{ stability_results.stability_metrics.stability_grade }}</div>
+                        <div class="metric-label">Stability Grade</div>
+                    </div>
+                </div>
+                <div class="stability-summary">
+                    <p><strong>Overall Assessment:</strong> {{ stability_results.summary.overall_assessment }}</p>
+                    <p><strong>Recommendation:</strong> {{ stability_results.summary.recommendation }}</p>
+                    <p><strong>Confidence Interval:</strong> ({{ "%.3f"|format(stability_results.stability_metrics.confidence_interval[0]) }}, {{ "%.3f"|format(stability_results.stability_metrics.confidence_interval[1]) }})</p>
+                </div>
+            </div>
+            {% endif %}
         </div>
         {% endif %}
 

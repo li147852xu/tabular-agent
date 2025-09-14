@@ -1,0 +1,125 @@
+# Risk Policy Configuration for Tabular Agent v0.3
+# 风险策略配置文件
+
+# Risk thresholds for different risk types
+# 不同风险类型的阈值
+risk_thresholds:
+  overfitting: 0.1      # Train vs OOF difference threshold
+  leakage: 0.05         # Leakage score threshold
+  instability: 0.15     # CV coefficient of variation threshold
+  calibration: 0.1      # Calibration error threshold
+  data_drift: 0.2       # PSI threshold
+
+# Retry suggestions for each risk type
+# 每种风险类型的重试建议
+retry_suggestions:
+  overfitting:
+    - shrink_search_space
+    - add_regularization
+    - change_cv_strategy
+    - increase_data
+  
+  leakage:
+    - remove_features
+    - recalculate_features
+    - change_cv_strategy
+  
+  instability:
+    - change_cv_strategy
+    - add_regularization
+    - increase_data
+    - change_model
+  
+  calibration:
+    - change_model
+    - add_regularization
+    - change_cv_strategy
+  
+  data_drift:
+    - recalculate_features
+    - increase_data
+    - change_cv_strategy
+
+# Risk descriptions
+# 风险描述
+risk_descriptions:
+  overfitting: "Model shows signs of overfitting with significant performance gap between training and validation"
+  leakage: "Potential data leakage detected in features or data preparation"
+  instability: "Model performance varies significantly across different random seeds"
+  calibration: "Model predictions are poorly calibrated and unreliable"
+  data_drift: "Significant distribution shift detected between train and test data"
+
+# Action descriptions
+# 操作描述
+action_descriptions:
+  shrink_search_space: "Reduce hyperparameter search space to prevent overfitting"
+  add_regularization: "Add regularization (L1/L2) to reduce overfitting"
+  change_cv_strategy: "Use time-based or stratified CV to improve stability"
+  remove_features: "Remove suspicious features that may cause leakage"
+  recalculate_features: "Recalculate features with proper time windows"
+  increase_data: "Collect more training data to improve stability"
+  change_model: "Try a different model type (e.g., linear vs tree-based)"
+
+# Implementation guidance
+# 实施指导
+implementation_guidance:
+  shrink_search_space: "Reduce max_depth, min_samples_split, learning_rate ranges"
+  add_regularization: "Add alpha parameter for L1/L2 regularization"
+  change_cv_strategy: "Use TimeSeriesSplit or GroupKFold instead of KFold"
+  remove_features: "Remove features with high correlation to target or suspicious patterns"
+  recalculate_features: "Ensure feature calculation respects time boundaries"
+  increase_data: "Collect more historical data or use data augmentation"
+  change_model: "Switch between linear models, tree-based models, or neural networks"
+
+# Risk level definitions
+# 风险级别定义
+risk_levels:
+  high:
+    threshold_multiplier: 2.0
+    color: "#FF6B6B"
+    description: "High risk - immediate action required"
+  medium:
+    threshold_multiplier: 1.0
+    color: "#FFE66D"
+    description: "Medium risk - attention needed"
+  low:
+    threshold_multiplier: 0.5
+    color: "#4ECDC4"
+    description: "Low risk - monitor closely"
+
+# Stability evaluation settings
+# 稳定性评估设置
+stability_settings:
+  default_runs: 5
+  confidence_level: 0.95
+  min_successful_runs: 3
+  stability_grades:
+    A: 0.05    # Excellent
+    B: 0.10    # Good
+    C: 0.15    # Fair
+    D: 0.20    # Poor
+    F: 1.0     # Very Poor
+
+# Calibration settings
+# 校准设置
+calibration_settings:
+  methods:
+    - isotonic
+    - platt
+    - none
+  default_method: isotonic
+  bins: 10
+  min_samples_per_bin: 10
+
+# Threshold optimization settings
+# 阈值优化设置
+threshold_settings:
+  methods:
+    - youden
+    - ks_max
+    - cost_sensitive
+  default_method: youden
+  cost_ratios:
+    - 1.0    # Equal cost
+    - 2.0    # False negative 2x more costly
+    - 0.5    # False positive 2x more costly

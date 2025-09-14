@@ -9,6 +9,7 @@ src/tabular_agent.egg-info/requires.txt
 src/tabular_agent.egg-info/top_level.txt
 src/tabular_agent/agent/__init__.py
 src/tabular_agent/agent/planner.py
+src/tabular_agent/agent/reflector.py
 src/tabular_agent/agent/kb/__init__.py
 src/tabular_agent/agent/kb/index.py
 src/tabular_agent/agent/kb/query.py
@@ -23,6 +24,7 @@ src/tabular_agent/core/blend/__init__.py
 src/tabular_agent/core/blend/basic.py
 src/tabular_agent/core/evaluate/__init__.py
 src/tabular_agent/core/evaluate/metrics.py
+src/tabular_agent/core/evaluate/stability.py
 src/tabular_agent/core/fe/__init__.py
 src/tabular_agent/core/fe/encoders.py
 src/tabular_agent/core/fe/pipelines.py
@@ -36,3 +38,5 @@ src/tabular_agent/core/tune/optuna.py
 src/tabular_agent/examples/generate_example_data.py
 tests/test_kb_index.py
 tests/test_planner_guard.py
+tests/test_reflector.py
+tests/test_stability.py
