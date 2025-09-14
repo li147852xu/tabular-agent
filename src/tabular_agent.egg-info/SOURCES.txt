@@ -14,6 +14,9 @@ src/tabular_agent/agent/kb/__init__.py
 src/tabular_agent/agent/kb/index.py
 src/tabular_agent/agent/kb/query.py
 src/tabular_agent/cli/__init__.py
+src/tabular_agent/cli/audit.py
+src/tabular_agent/cli/blend.py
+src/tabular_agent/cli/entry.py
 src/tabular_agent/cli/run.py
 src/tabular_agent/core/__init__.py
 src/tabular_agent/core/audit.py

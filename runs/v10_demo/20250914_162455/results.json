@@ -1,0 +1,251 @@
+{
+  "train_metadata": {
+    "file_path": "examples/train_binary.csv",
+    "shape": [
+      800,
+      21
+    ],
+    "columns": [
+      "feature_0",
+      "feature_1",
+      "feature_2",
+      "feature_3",
+      "feature_4",
+      "feature_5",
+      "feature_6",
+      "feature_7",
+      "feature_8",
+      "feature_9",
+      "feature_10",
+      "feature_11",
+      "feature_12",
+      "feature_13",
+      "feature_14",
+      "feature_15",
+      "feature_16",
+      "feature_17",
+      "feature_18",
+      "feature_19",
+      "target"
+    ],
+    "dtypes": {
+      "feature_0": "float64",
+      "feature_1": "float64",
+      "feature_2": "float64",
+      "feature_3": "float64",
+      "feature_4": "float64",
+      "feature_5": "float64",
+      "feature_6": "float64",
+      "feature_7": "float64",
+      "feature_8": "float64",
+      "feature_9": "float64",
+      "feature_10": "float64",
+      "feature_11": "float64",
+      "feature_12": "float64",
+      "feature_13": "float64",
+      "feature_14": "float64",
+      "feature_15": "float64",
+      "feature_16": "float64",
+      "feature_17": "float64",
+      "feature_18": "float64",
+      "feature_19": "float64",
+      "target": "int64"
+    },
+    "type_info": {
+      "feature_0": "numeric",
+      "feature_1": "numeric",
+      "feature_2": "numeric",
+      "feature_3": "numeric",
+      "feature_4": "numeric",
+      "feature_5": "numeric",
+      "feature_6": "numeric",
+      "feature_7": "numeric",
+      "feature_8": "numeric",
+      "feature_9": "numeric",
+      "feature_10": "numeric",
+      "feature_11": "numeric",
+      "feature_12": "numeric",
+      "feature_13": "numeric",
+      "feature_14": "numeric",
+      "feature_15": "numeric",
+      "feature_16": "numeric",
+      "feature_17": "numeric",
+      "feature_18": "numeric",
+      "feature_19": "numeric",
+      "target": "numeric"
+    },
+    "sparse_info": {
+      "feature_0": {
+        "sparsity": 0.0,
+        "null_ratio": 0.0,
+        "zero_ratio": 0.0,
+        "converted_to_sparse": false
+      },
+      "feature_1": {
+        "sparsity": 0.0,
+        "null_ratio": 0.0,
+        "zero_ratio": 0.0,
+        "converted_to_sparse": false
+      },
+      "feature_2": {
+        "sparsity": 0.0,
+        "null_ratio": 0.0,
+        "zero_ratio": 0.0,
+        "converted_to_sparse": false
+      },
+      "feature_3": {
+        "sparsity": 0.0,
+        "null_ratio": 0.0,
+        "zero_ratio": 0.0,
+        "converted_to_sparse": false
+      },
+      "feature_4": {
+        "sparsity": 0.0,
+        "null_ratio": 0.0,
+        "zero_ratio": 0.0,
+        "converted_to_sparse": false
+      },
+      "feature_5": {
+        "sparsity": 0.0,
+        "null_ratio": 0.0,
+        "zero_ratio": 0.0,
+        "converted_to_sparse": false
+      },
+      "feature_6": {
+        "sparsity": 0.0,
+        "null_ratio": 0.0,
+        "zero_ratio": 0.0,
+        "converted_to_sparse": false
+      },
+      "feature_7": {
+        "sparsity": 0.0,
+        "null_ratio": 0.0,
+        "zero_ratio": 0.0,
+        "converted_to_sparse": false
+      },
+      "feature_8": {
+        "sparsity": 0.0,
+        "null_ratio": 0.0,
+        "zero_ratio": 0.0,
+        "converted_to_sparse": false
+      },
+      "feature_9": {
+        "sparsity": 0.0,
+        "null_ratio": 0.0,
+        "zero_ratio": 0.0,
+        "converted_to_sparse": false
+      },
+      "feature_10": {
+        "sparsity": 0.0,
+        "null_ratio": 0.0,
+        "zero_ratio": 0.0,
+        "converted_to_sparse": false
+      },
+      "feature_11": {
+        "sparsity": 0.0,
+        "null_ratio": 0.0,
+        "zero_ratio": 0.0,
+        "converted_to_sparse": false
+      },
+      "feature_12": {
+        "sparsity": 0.0,
+        "null_ratio": 0.0,
+        "zero_ratio": 0.0,
+        "converted_to_sparse": false
+      },
+      "feature_13": {
+        "sparsity": 0.0,
+        "null_ratio": 0.0,
+        "zero_ratio": 0.0,
+        "converted_to_sparse": false
+      },
+      "feature_14": {
+        "sparsity": 0.0,
+        "null_ratio": 0.0,
+        "zero_ratio": 0.0,
+        "converted_to_sparse": false
+      },
+      "feature_15": {
+        "sparsity": 0.0,
+        "null_ratio": 0.0,
+        "zero_ratio": 0.0,
+        "converted_to_sparse": false
+      },
+      "feature_16": {
+        "sparsity": 0.0,
+        "null_ratio": 0.0,
+        "zero_ratio": 0.0,
+        "converted_to_sparse": false
+      },
+      "feature_17": {
+        "sparsity": 0.0,
+        "null_ratio": 0.0,
+        "zero_ratio": 0.0,
+        "converted_to_sparse": false
+      },
+      "feature_18": {
+        "sparsity": 0.0,
+        "null_ratio": 0.0,
+        "zero_ratio": 0.0,
+        "converted_to_sparse": false
+      },
+      "feature_19": {
+        "sparsity": 0.0,
+        "null_ratio": 0.0,
+        "zero_ratio": 0.0,
+        "converted_to_sparse": false
+      },
+      "target": {
+        "sparsity": 0.50125,
+        "null_ratio": 0.0,
+        "zero_ratio": 0.50125,
+        "converted_to_sparse": false
+      }
+    },
+    "quality_info": {
+      "missing_values": {
+        "feature_0": 0,
+        "feature_1": 0,
+        "feature_2": 0,
+        "feature_3": 0,
+        "feature_4": 0,
+        "feature_5": 0,
+        "feature_6": 0,
+        "feature_7": 0,
+        "feature_8": 0,
+        "feature_9": 0,
+        "feature_10": 0,
+        "feature_11": 0,
+        "feature_12": 0,
+        "feature_13": 0,
+        "feature_14": 0,
+        "feature_15": 0,
+        "feature_16": 0,
+        "feature_17": 0,
+        "feature_18": 0,
+        "feature_19": 0,
+        "target": 0
+      },
+      "duplicate_rows": 0,
+      "memory_usage": 134532,
+      "target": {
+        "unique_values": 2,
+        "value_counts": {
+          "0": 401,
+          "1": 399
+        },
+        "is_binary": true,
+        "class_balance": {
+          "0": 0.50125,
+          "1": 0.49875
+        }
+      }
+    },
+    "profile": {
+      "basic_info": {
+        "shape": [
+          800,
+          21
+        ],
+        "memory_usage": 134532,
+        "dtypes": {

@@ -9,6 +9,87 @@ from sklearn.model_selection import cross_val_score
 import warnings
 
 
+class ModelBlender:
+    """Main model blender class that coordinates different blending strategies."""
+    
+    def __init__(self):
+        """Initialize model blender."""
+        self.blenders = {
+            'mean': MeanBlender,
+            'rank-mean': RankMeanBlender,
+            'logit-mean': LogitMeanBlender,
+            'stacking': StackingBlender
+        }
+    
+    def blend_models(self, model_results: List[Dict[str, Any]], strategy: str = 'mean') -> Dict[str, Any]:
+        """
+        Blend multiple models using specified strategy.
+        
+        Args:
+            model_results: List of model results dictionaries
+            strategy: Blending strategy to use
+            
+        Returns:
+            Blending results dictionary
+        """
+        if strategy not in self.blenders:
+            raise ValueError(f"Unknown blending strategy: {strategy}")
+        
+        # Create blender instance
+        BlenderClass = self.blenders[strategy]
+        blender = BlenderClass()
+        
+        # Extract predictions and labels
+        predictions = []
+        labels = None
+        
+        for result in model_results:
+            if 'predictions' in result:
+                predictions.append(result['predictions'])
+            if 'probabilities' in result and labels is None:
+                # Use probabilities for classification
+                labels = result.get('labels', None)
+        
+        if not predictions:
+            raise ValueError("No predictions found in model results")
+        
+        # Convert to numpy arrays
+        predictions = np.array(predictions).T  # Shape: (n_samples, n_models)
+        
+        # Perform blending
+        if strategy in ['mean', 'rank-mean', 'logit-mean']:
+            blended_pred = blender.fit_transform(predictions)
+        else:
+            # For stacking, we need more complex setup
+            blended_pred = blender.fit_transform(predictions)
+        
+        # Calculate metrics
+        if labels is not None:
+            from sklearn.metrics import accuracy_score, roc_auc_score
+            accuracy = accuracy_score(labels, blended_pred > 0.5)
+            try:
+                auc = roc_auc_score(labels, blended_pred)
+            except:
+                auc = 0.5
+        else:
+            accuracy = 0.0
+            auc = 0.5
+        
+        return {
+            'strategy': strategy,
+            'blended_predictions': blended_pred,
+            'accuracy': accuracy,
+            'auc': auc,
+            'n_models': len(model_results),
+            'summary': {
+                'strategy': strategy,
+                'n_models': len(model_results),
+                'accuracy': accuracy,
+                'auc': auc
+            }
+        }
+
+
 class MeanBlender(BaseEstimator, TransformerMixin):
     """Simple mean blending of model predictions."""
     

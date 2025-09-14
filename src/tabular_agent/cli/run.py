@@ -14,6 +14,104 @@ import yaml
 from tabular_agent.core.orchestrator import PipelineOrchestrator
 
 
+def run_pipeline_impl(**kwargs):
+    """Run the complete ML pipeline from data to model card (non-Click version)."""
+    # Convert numpy types for JSON serialization
+    def convert_numpy_types(obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, dict):
+            return {str(key): convert_numpy_types(value) for key, value in obj.items()}
+        elif isinstance(obj, list):
+            return [convert_numpy_types(item) for item in obj]
+        elif hasattr(obj, 'dtype'):  # Handle pandas dtypes
+            return str(obj)
+        return obj
+
+    # Create output directory
+    output_dir = Path(kwargs['out'])
+    output_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Create timestamped run directory
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    run_dir = output_dir / timestamp
+    run_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Save configuration
+    config_dict = {
+        'train_path': kwargs['train'],
+        'test_path': kwargs['test'],
+        'target': kwargs['target'],
+        'time_col': kwargs.get('time_col'),
+        'n_jobs': kwargs.get('n_jobs', 1),
+        'time_budget': kwargs.get('time_budget', 300),
+        'audit_cli': kwargs.get('audit_cli'),
+        'seed': kwargs.get('seed', 42),
+        'verbose': kwargs.get('verbose', False),
+        'stability_runs': kwargs.get('stability_runs', 5),
+        'calibration': kwargs.get('calibration', 'none'),
+        'risk_policy': kwargs.get('risk_policy')
+    }
+    
+    if kwargs.get('verbose', False):
+        print("Starting tabular-agent pipeline...")
+        print(f"Run directory: {run_dir}")
+        print(f"Configuration: {json.dumps(config_dict, indent=2)}")
+    
+    try:
+        # Initialize orchestrator
+        orchestrator = PipelineOrchestrator(
+            config_dict, 
+            planner_mode=kwargs.get('planner', 'auto'),
+            llm_endpoint=kwargs.get('llm_endpoint'),
+            llm_key=kwargs.get('llm_key')
+        )
+        
+        # Run pipeline
+        results = orchestrator.run(run_dir)
+        
+        # Convert numpy types for JSON serialization
+        results = convert_numpy_types(results)
+        
+        # Save results
+        results_file = run_dir / "results.json"
+        with open(results_file, 'w') as f:
+            json.dump(results, f, indent=2, default=str)
+        
+        # Save metadata
+        meta = {
+            'version': '1.0.0',
+            'git_hash': 'unknown',
+            'timestamp': timestamp,
+            'config': config_dict,
+            'pipeline_time': results.get('pipeline_time', 0),
+            'model_card_path': results.get('model_card_path', '')
+        }
+        
+        meta_file = run_dir / "meta.json"
+        with open(meta_file, 'w') as f:
+            json.dump(meta, f, indent=2, default=str)
+        
+        if kwargs.get('verbose', False):
+            print(f"Pipeline completed successfully in {results.get('pipeline_time', 0):.2f} seconds")
+            print(f"Model card saved to: {results.get('model_card_path', '')}")
+        
+        print("Pipeline completed successfully!")
+        print(f"Results saved to: {run_dir}")
+        print(f"Model card: {results.get('model_card_path', '')}")
+        
+    except Exception as e:
+        print(f"Pipeline failed: {e}")
+        if kwargs.get('verbose', False):
+            import traceback
+            traceback.print_exc()
+        sys.exit(1)
+
+
 def main() -> None:
     """Main CLI entry point."""
     cli()

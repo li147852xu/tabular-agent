@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tabular-agent"
-version = "0.3.0"
+version = "1.0.0"
 description = "Automated tabular ML pipeline from CSV to model card reports"
 authors = [
     {name = "tabular-agent team", email = "tabular-agent@example.com"}
@@ -13,14 +13,18 @@ readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.8"
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
     "numpy>=1.21.0",
@@ -40,6 +44,8 @@ dependencies = [
     "click>=8.0.0",
     "joblib>=1.1.0",
     "pydantic>=1.10.0",
+    "requests>=2.25.0",
+    "rank-bm25>=0.2.2"
 ]
 
 [project.optional-dependencies]
@@ -51,9 +57,18 @@ dev = [
     "flake8>=4.0.0",
     "mypy>=0.950",
 ]
+audit = [
+    "leakage-buster>=0.1.0"
+]
+blend = [
+    "crediblend>=0.1.0"
+]
+all = [
+    "tabular-agent[dev,audit,blend]"
+]
 
 [project.scripts]
-tabular-agent = "tabular_agent.cli.run:main"
+tabular-agent = "tabular_agent.cli.entry:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
