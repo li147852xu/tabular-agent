@@ -14,10 +14,10 @@ import yaml
 from tabular_agent.core.orchestrator import PipelineOrchestrator
 
 
-def run_pipeline_impl(**kwargs):
+def run_pipeline_impl(**kwargs) -> None:
     """Run the complete ML pipeline from data to model card (non-Click version)."""
     # Convert numpy types for JSON serialization
-    def convert_numpy_types(obj):
+    def convert_numpy_types(obj: Any) -> Any:
         if isinstance(obj, np.integer):
             return int(obj)
         elif isinstance(obj, np.floating):
@@ -118,7 +118,7 @@ def main() -> None:
 
 
 @click.group()
-def cli():
+def cli() -> None:
     """Tabular Agent - Automated ML pipeline from CSV to model card reports."""
     pass
 
@@ -224,7 +224,7 @@ def run(
             "results": results,
         }
         
-        def convert_numpy_types(obj):
+        def convert_numpy_types(obj: Any) -> Any:
             """Convert numpy types to Python types for JSON serialization."""
             if isinstance(obj, dict):
                 return {str(k): convert_numpy_types(v) for k, v in obj.items()}
@@ -263,7 +263,8 @@ def run(
 def _load_config(config_path: str) -> Dict[str, Any]:
     """Load configuration from YAML file."""
     with open(config_path, "r") as f:
-        return yaml.safe_load(f)
+        result = yaml.safe_load(f)
+        return result if result is not None else {}
 
 
 def _get_git_hash() -> str:
