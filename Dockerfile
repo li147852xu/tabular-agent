@@ -13,7 +13,6 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
-    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for better caching
@@ -21,12 +20,10 @@ COPY pyproject.toml ./
 
 # Install Python dependencies
 RUN pip install --upgrade pip && \
-    pip install -e .[all]
+    pip install -e .
 
 # Copy source code
 COPY src/ ./src/
-COPY examples/ ./examples/
-COPY conf/ ./conf/
 
 # Create necessary directories
 RUN mkdir -p /app/runs /app/data /app/output
@@ -34,15 +31,6 @@ RUN mkdir -p /app/runs /app/data /app/output
 # Set environment variables for resource limits
 ENV TABULAR_AGENT_MAX_MEMORY=8G
 ENV TABULAR_AGENT_MAX_THREADS=4
-
-# Create non-root user
-RUN useradd --create-home --shell /bin/bash tabular-agent && \
-    chown -R tabular-agent:tabular-agent /app
-USER tabular-agent
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD tabular-agent --help > /dev/null || exit 1
 
 # Default command
 ENTRYPOINT ["tabular-agent"]
