@@ -9,6 +9,7 @@ COPY pyproject.toml ./
 
 # Install Python dependencies
 RUN pip install --upgrade pip && \
+    pip install numpy pandas scikit-learn lightgbm xgboost catboost optuna jinja2 pyyaml matplotlib seaborn plotly psutil tqdm click joblib pydantic requests rank-bm25 && \
     pip install -e .
 
 # Copy source code
