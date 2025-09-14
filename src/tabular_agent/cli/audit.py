@@ -147,8 +147,8 @@ def _audit_with_builtin(
         click.echo("Using builtin leakage detection...")
     
     # Profile data
-    profiler = DataProfiler(target_col=target, time_col=time_col)
-    profile = profiler.profile(df)
+    profiler = DataProfiler()
+    profile = profiler.profile_data(df, target, time_col)
     
     # Perform leakage audit
     auditor = LeakageAuditor()

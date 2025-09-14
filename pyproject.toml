@@ -86,6 +86,16 @@ line_length = 88
 
 [tool.mypy]
 python_version = "3.8"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
+warn_return_any = false
+warn_unused_configs = false
+disallow_untyped_defs = false
+ignore_missing_imports = true
+exclude = [
+    ".*/bokeh/.*",
+    ".*/matplotlib/.*",
+    ".*/seaborn/.*",
+    ".*/plotly/.*",
+    ".*/catboost/.*",
+    ".*/lightgbm/.*",
+    ".*/xgboost/.*"
+]

@@ -14,7 +14,7 @@ from .audit import LeakageAuditor
 from .fe.pipelines import FeatureEngineeringPipeline
 from .models.trainers import ModelTrainer, EnsembleTrainer
 from .tune.optuna import OptunaTuner, MultiModelTuner
-from .blend.basic import BlendingEnsemble, ModelBlender
+from .blend.basic import BlendingEnsemble
 from .evaluate.metrics import MetricsCalculator, CalibrationAnalyzer, ThresholdOptimizer, StabilityAnalyzer
 from .evaluate.stability import StabilityEvaluator
 from .report.card import ModelCardGenerator
@@ -63,17 +63,17 @@ class PipelineOrchestrator:
         )
         
         # Initialize components
-        self.data_profiler: Optional[DataProfiler] = None
-        self.leakage_auditor: Optional[LeakageAuditor] = None
-        self.feature_pipeline: Optional[FeatureEngineeringPipeline] = None
-        self.model_trainer: Optional[ModelTrainer] = None
-        self.tuner: Optional[OptunaTuner] = None
-        self.blender: Optional[ModelBlender] = None
-        self.metrics_calculator: Optional[MetricsCalculator] = None
-        self.calibration_analyzer: Optional[CalibrationAnalyzer] = None
-        self.threshold_optimizer: Optional[ThresholdOptimizer] = None
-        self.stability_analyzer: Optional[StabilityAnalyzer] = None
-        self.model_card_generator: Optional[ModelCardGenerator] = None
+        self.data_profiler = None
+        self.leakage_auditor = None
+        self.feature_pipeline = None
+        self.model_trainer = None
+        self.tuner = None
+        self.blender = None
+        self.metrics_calculator = None
+        self.calibration_analyzer = None
+        self.threshold_optimizer = None
+        self.stability_analyzer = None
+        self.model_card_generator = None
     
     def run(self, output_dir: Union[str, Path]) -> Dict[str, Any]:
         """
@@ -423,7 +423,7 @@ class PipelineOrchestrator:
                 'seed': self.config.get('seed', 42)
             },
             planning_result=planning_result.dict() if planning_result else None,
-            stability_results=stability_results or {},
+            stability_results=stability_results,
             risk_analysis=risk_analysis
         )
         

@@ -64,7 +64,7 @@ class ModelCardGenerator:
         """
         # Generate plots
         plots = self._generate_plots(
-            model_results, data_profile, calibration_results, stability_results, feature_importance
+            model_results, data_profile, calibration_results, stability_results
         )
         
         # Prepare data for template
@@ -89,8 +89,7 @@ class ModelCardGenerator:
         model_results: Dict[str, Any],
         data_profile: Dict[str, Any],
         calibration_results: Dict[str, Any],
-        stability_results: Dict[str, Any],
-        feature_importance: Optional[Dict[str, float]] = None
+        stability_results: Dict[str, Any]
     ) -> Dict[str, str]:
         """Generate plots for the model card."""
         plots = {}
@@ -109,7 +108,7 @@ class ModelCardGenerator:
                 plots['calibration'] = self._plot_calibration(calibration_results)
             
             # Feature Importance
-            if feature_importance and len(feature_importance) > 0:
+            if feature_importance:
                 plots['feature_importance'] = self._plot_feature_importance(feature_importance)
             
             # Data Distribution
