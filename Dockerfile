@@ -15,7 +15,7 @@ RUN pip install --upgrade pip && \
 COPY src/ ./src/
 
 # Default command
-ENTRYPOINT ["tabular-agent"]
+ENTRYPOINT ["python", "-m", "tabular_agent.cli.entry"]
 
 # Default arguments
 CMD ["--help"]
