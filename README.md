@@ -1,308 +1,339 @@
-# Tabular Agent v1.0 🚀
+# Tabular Agent v1.0.0
 
 [![CI](https://github.com/li147852xu/tabular-agent/workflows/CI/badge.svg)](https://github.com/li147852xu/tabular-agent/actions)
 [![codecov](https://codecov.io/gh/li147852xu/tabular-agent/branch/main/graph/badge.svg)](https://codecov.io/gh/li147852xu/tabular-agent)
 [![PyPI version](https://badge.fury.io/py/tabular-agent.svg)](https://badge.fury.io/py/tabular-agent)
-[![Docker](https://img.shields.io/docker/v/tabular-agent/latest)](https://hub.docker.com/r/tabular-agent/latest)
-[![Python](https://img.shields.io/pypi/pyversions/tabular-agent)](https://pypi.org/project/tabular-agent/)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Python Support](https://img.shields.io/pypi/pyversions/tabular-agent.svg)](https://pypi.org/project/tabular-agent/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> **Production-ready automated ML pipeline for tabular data**  
-> From CSV to professional model card reports in minutes
+**Tabular Agent** 是一个全自动化的机器学习管道，从CSV数据到模型卡报告的一站式解决方案。它集成了数据剖析、泄漏审计、特征工程、模型训练、超参数优化、模型融合、风险分析和稳定性评估等完整功能。
 
-## 🎯 Quick Start (3 minutes)
+## 🚀 快速开始
 
-### Install
+### 安装
+
 ```bash
+# 基础安装
 pip install tabular-agent
-```
 
-### Run
-```bash
-tabular-agent run \
-  --train examples/train_binary.csv \
-  --test examples/test_binary.csv \
-  --target target \
-  --out runs/my_experiment
-```
-
-### View Results
-```bash
-open runs/my_experiment/model_card.html
-```
-
-## ✨ Key Features
-
-### 🧠 **Intelligent Planning**
-- **LLM + Rule Hybrid**: Smart feature engineering and model selection
-- **RAG Citations**: Learn from historical runs and cite precedents
-- **Safe Fallbacks**: Automatic rule-based fallback when LLM fails
-
-### 🔍 **Comprehensive Auditing**
-- **Leakage Detection**: Built-in + `leakage-buster` integration
-- **Data Quality**: Missing values, outliers, distribution analysis
-- **Time Series**: Temporal leakage and drift detection
-
-### 🎯 **Advanced Modeling**
-- **Multiple Algorithms**: LightGBM, XGBoost, CatBoost, Linear models
-- **Auto-tuning**: Optuna-based hyperparameter optimization
-- **Ensemble Methods**: Mean, rank-mean, logit-mean blending
-
-### 📊 **Risk & Stability Analysis**
-- **Overfitting Detection**: Train vs OOF performance analysis
-- **Stability Evaluation**: Multi-run variance and confidence intervals
-- **Calibration**: Isotonic/Platt calibration methods
-- **Risk Grading**: High/Med/Low risk levels with actionable suggestions
-
-### 📈 **Professional Reporting**
-- **Model Cards**: Comprehensive HTML reports with visualizations
-- **Performance Metrics**: AUC, KS, PR-AUC, R², accuracy, precision, recall
-- **Feature Importance**: Shapley values and permutation importance
-- **Threshold Suggestions**: Cost-sensitive threshold optimization
-
-## 🚀 Installation
-
-### PyPI (Recommended)
-```bash
-pip install tabular-agent
-```
-
-### With Optional Dependencies
-```bash
-# Development tools
-pip install tabular-agent[dev]
-
-# Audit tools
-pip install tabular-agent[audit]
-
-# Blending tools
-pip install tabular-agent[blend]
-
-# Everything
+# 完整安装（包含所有功能）
 pip install tabular-agent[all]
-```
 
-### Docker
-```bash
-docker pull tabular-agent:latest
-docker run --rm -v $(pwd)/data:/app/data -v $(pwd)/runs:/app/runs \
-  tabular-agent:latest run --train data/train.csv --test data/test.csv --target y --out runs/exp1
-```
-
-### From Source
-```bash
+# 开发安装
 git clone https://github.com/li147852xu/tabular-agent.git
 cd tabular-agent
 pip install -e .[dev]
 ```
 
-## 📖 Usage
+### 基本使用
 
-### Basic Pipeline
 ```bash
+# 运行完整的ML管道
 tabular-agent run \
-  --train data/train.csv \
-  --test data/test.csv \
-  --target target_column \
-  --out runs/experiment_001
+    --train data/train.csv \
+    --test data/test.csv \
+    --target target_column \
+    --out results/
+
+# 查看帮助
+tabular-agent --help
+tabular-agent run --help
 ```
 
-### Time Series Data
-```bash
-tabular-agent run \
-  --train data/train.csv \
-  --test data/test.csv \
-  --target target_column \
-  --time-col timestamp \
-  --out runs/timeseries_exp
+## 📊 完整示例
+
+### 1. 准备数据
+
+首先，我们创建一个示例数据集：
+
+```python
+import pandas as pd
+import numpy as np
+
+# 创建示例数据
+np.random.seed(42)
+n_samples = 100
+
+# 生成特征
+X = np.random.randn(n_samples, 5)
+# 生成目标变量（二分类）
+y = (X[:, 0] + X[:, 1] + np.random.randn(n_samples) * 0.1 > 0).astype(int)
+
+# 创建DataFrame
+df = pd.DataFrame(X, columns=[f'feature{i+1}' for i in range(5)])
+df['target'] = y
+
+# 保存数据
+df[:80].to_csv('train.csv', index=False)  # 训练集
+df[80:].to_csv('test.csv', index=False)   # 测试集
 ```
 
-### Advanced Configuration
+### 2. 运行完整管道
+
 ```bash
+# 运行完整的ML管道
 tabular-agent run \
-  --train data/train.csv \
-  --test data/test.csv \
-  --target target_column \
-  --time-col date \
-  --n-jobs 8 \
-  --time-budget 180 \
-  --stability-runs 5 \
-  --calibration isotonic \
-  --planner llm \
-  --llm-endpoint https://api.openai.com/v1 \
-  --llm-key sk-... \
-  --out runs/advanced_exp
+    --train train.csv \
+    --test test.csv \
+    --target target \
+    --out results/ \
+    --verbose
 ```
 
-### Sub-commands
+### 3. 查看结果
 
-#### Data Auditing
+管道运行完成后，会在输出目录生成：
+
+```
+results/
+└── 20250915_023937/
+    ├── meta.json          # 运行元数据
+    ├── results.json       # 详细结果
+    └── model_card.html    # 模型卡报告
+```
+
+### 4. 模型卡报告
+
+打开 `model_card.html` 查看完整的模型卡报告，包含：
+
+- **数据概览**：数据统计、缺失值、数据类型
+- **泄漏审计**：时间泄漏、目标泄漏检测
+- **特征工程**：特征变换、编码、选择
+- **模型性能**：AUC、KS、PR-AUC、R²等指标
+- **稳定性分析**：重复运行、方差分析
+- **风险分析**：过拟合、泄漏、不稳定性检测
+- **规划与引用**：执行计划、历史案例引用
+
+## 🛠️ 高级功能
+
+### 子命令
+
 ```bash
+# 数据审计
 tabular-agent audit \
-  --data data/train.csv \
-  --target target_column \
-  --out audit_results
-```
+    --data data.csv \
+    --target target_column \
+    --out audit_results/
 
-#### Model Blending
-```bash
+# 模型融合
 tabular-agent blend \
-  --models runs/experiment_001 \
-  --out blend_results \
-  --strategy rank-mean
+    --models model_results/ \
+    --out blend_results/ \
+    --strategy mean
 ```
 
-## 📊 Performance & KPI
+### 高级选项
 
-| Metric | Target | Achieved |
-|--------|--------|----------|
-| **Processing Speed** | < 5 min for 10K samples | ✅ 2.3 min |
-| **Memory Usage** | < 8GB for 100K samples | ✅ 6.2GB |
-| **Model Performance** | AUC > 0.85 on benchmark | ✅ 0.87 |
-| **Stability** | OOF variance < 1e-4 | ✅ 2.3e-5 |
-| **Reproducibility** | Same seed = same results | ✅ 100% |
-
-## 🏗️ Architecture
-
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Data Input    │───▶│  Data Profiling │───▶│  Leakage Audit  │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-                                                       │
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│  Model Card     │◀───│   Evaluation    │◀───│  Feature Eng.   │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         ▼                       ▼                       ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│  Risk Analysis  │    │  Model Training │    │   Planning      │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-```
-
-## 🔧 Configuration
-
-### Environment Variables
 ```bash
-export TABULAR_AGENT_MAX_MEMORY=8G
-export TABULAR_AGENT_MAX_THREADS=4
-export LLM_ENDPOINT=https://api.openai.com/v1
-export LLM_KEY=sk-...
+# 使用LLM规划器
+tabular-agent run \
+    --train train.csv \
+    --test test.csv \
+    --target target \
+    --out results/ \
+    --planner llm \
+    --llm-endpoint https://api.openai.com/v1 \
+    --llm-key your-api-key
+
+# 稳定性评估
+tabular-agent run \
+    --train train.csv \
+    --test test.csv \
+    --target target \
+    --out results/ \
+    --stability-runs 10 \
+    --calibration isotonic
+
+# 风险策略
+tabular-agent run \
+    --train train.csv \
+    --test test.csv \
+    --target target \
+    --out results/ \
+    --risk-policy conf/risk_policy.yaml
 ```
 
-### Risk Policy (`conf/risk_policy.yaml`)
+## 🏗️ 架构
+
+### 核心组件
+
+- **数据剖析器** (`DataProfiler`): 自动数据质量分析
+- **泄漏审计器** (`LeakageAuditor`): 检测数据泄漏
+- **特征工程师** (`FeatureEngineer`): 智能特征工程
+- **模型训练器** (`ModelTrainer`): 多模型训练与调优
+- **模型评估器** (`ModelEvaluator`): 全面性能评估
+- **模型融合器** (`ModelBlender`): 集成学习
+- **规划器** (`Planner`): LLM+规则混合规划
+- **知识库** (`KnowledgeBase`): 历史案例RAG检索
+- **反射器** (`Reflector`): 风险分析与建议
+- **稳定性评估器** (`StabilityEvaluator`): 模型稳定性测试
+
+### 工作流程
+
+```mermaid
+graph TD
+    A[CSV数据] --> B[数据剖析]
+    B --> C[泄漏审计]
+    C --> D[特征工程]
+    D --> E[模型训练]
+    E --> F[超参数优化]
+    F --> G[模型评估]
+    G --> H[稳定性测试]
+    H --> I[风险分析]
+    I --> J[模型融合]
+    J --> K[模型卡生成]
+    
+    L[规划器] --> D
+    M[知识库] --> L
+    N[反射器] --> I
+```
+
+## 📈 性能指标
+
+### 支持的任务类型
+
+- **二分类**: AUC, KS, PR-AUC, F1, Precision, Recall
+- **多分类**: 宏平均/微平均F1, 准确率
+- **回归**: R², MAE, MSE, RMSE
+- **排序**: NDCG, MAP
+
+### 稳定性指标
+
+- **OOF稳定性**: 重复运行方差
+- **特征重要性稳定性**: 特征排序一致性
+- **预测稳定性**: 预测分布一致性
+- **校准稳定性**: 概率校准一致性
+
+## 🔧 配置
+
+### 配置文件
+
 ```yaml
+# conf/default.yaml
+data:
+  target: target_column
+  time_col: timestamp
+  cv_folds: 5
+
+models:
+  - lightgbm
+  - xgboost
+  - catboost
+
+features:
+  encoding: target
+  scaling: standard
+  selection: mutual_info
+
+evaluation:
+  metrics: [auc, ks, pr_auc]
+  stability_runs: 5
+  calibration: isotonic
+```
+
+### 风险策略
+
+```yaml
+# conf/risk_policy.yaml
 overfitting:
-  train_oof_diff_threshold: 0.05
-  time_drift_threshold: 0.1
+  train_test_gap_threshold: 0.05
+  cv_std_threshold: 0.02
 
 leakage:
-  feature_correlation_threshold: 0.9
-  target_leakage_threshold: 0.95
+  time_leakage_threshold: 0.8
+  target_leakage_threshold: 0.9
 
 instability:
-  auc_cv_threshold: 0.1
-  feature_importance_cv_threshold: 0.2
+  auc_std_threshold: 0.01
+  feature_importance_threshold: 0.3
+
+calibration:
+  brier_threshold: 0.25
+  reliability_threshold: 0.1
 ```
 
-## 📁 Output Structure
+## 🐳 Docker支持
 
-```
-runs/experiment_001/
-├── meta.json              # Metadata (version, git hash, config)
-├── results.json           # Detailed results and metrics
-├── model_card.html        # Professional model card report
-├── risk_analysis.json     # Risk analysis details
-└── kb/                    # Knowledge base for RAG
-    ├── vector_index.pkl
-    └── bm25_index.pkl
-```
-
-## 🧪 Testing & Quality
-
-### Run Tests
 ```bash
-make test
+# 构建镜像
+docker build -t tabular-agent .
+
+# 运行容器
+docker run -v $(pwd)/data:/data -v $(pwd)/results:/results \
+    tabular-agent run \
+    --train /data/train.csv \
+    --test /data/test.csv \
+    --target target \
+    --out /results/
 ```
 
-### Self-Check
+## 🧪 测试
+
 ```bash
-make selfcheck
+# 运行测试
+pytest tests/ -v
+
+# 运行本地验证
+python test_local.py
+
+# 运行修复脚本
+./fix_ci.sh
 ```
 
-### Docker Test
+## 📚 文档
+
+- [安装指南](docs/installation.md)
+- [配置说明](docs/configuration.md)
+- [API参考](docs/api.md)
+- [故障排除](docs/troubleshooting.md)
+- [GitHub Secrets配置](docs/setup-secrets.md)
+
+## 🤝 贡献
+
+欢迎贡献代码！请查看 [CONTRIBUTING.md](CONTRIBUTING.md) 了解详情。
+
+### 开发环境
+
 ```bash
-make docker-run
-```
-
-## 📚 Documentation
-
-- [**v0.1 README**](README_v0.1.md) - Basic pipeline features
-- [**v0.2 README**](README_v0.2.md) - Planning and RAG citations
-- [**v0.3 README**](README_v0.3.md) - Risk analysis and stability
-- [**API Reference**](docs/api.md) - Detailed API documentation
-- [**Recipes**](docs/recipes/) - Usage examples and best practices
-
-## 🔗 Integration
-
-### With B/C Systems
-- **Audit Integration**: `tabular-agent audit` calls `leakage-buster`
-- **Blend Integration**: `tabular-agent blend` calls `crediblend`
-- **CLI/SDK**: Full command-line and programmatic interfaces
-
-### CI/CD Integration
-```yaml
-- name: Run Tabular Agent
-  uses: tabular-agent/action@v1
-  with:
-    train: data/train.csv
-    test: data/test.csv
-    target: target_column
-    output: runs/ci_experiment
-```
-
-## 🚨 Known Issues & Limitations
-
-### Current Limitations
-- **Memory**: Large datasets (>1M rows) may require sampling
-- **Time**: Complex feature engineering can be slow on very wide datasets
-- **LLM**: Requires API key for advanced planning features
-
-### Workarounds
-- Use `--time-budget` to limit processing time
-- Enable `--n-jobs` for parallel processing
-- Use `--planner rules` to avoid LLM dependencies
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md).
-
-### Development Setup
-```bash
+# 克隆仓库
 git clone https://github.com/li147852xu/tabular-agent.git
 cd tabular-agent
-make venv
-make install
-make test
+
+# 安装开发依赖
+pip install -e .[dev]
+
+# 运行测试
+pytest tests/ -v
+
+# 代码格式化
+black src/ tests/
+isort src/ tests/
+
+# 类型检查
+mypy src/
 ```
 
-## 📄 License
+## 📄 许可证
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+本项目采用 MIT 许可证。详见 [LICENSE](LICENSE) 文件。
 
-## 🙏 Acknowledgments
+## 🙏 致谢
 
-- **Optuna** for hyperparameter optimization
-- **LightGBM, XGBoost, CatBoost** for gradient boosting
-- **scikit-learn** for machine learning utilities
-- **leakage-buster** for data leakage detection
-- **crediblend** for model blending
+感谢以下开源项目的支持：
 
-## 📞 Support
+- [scikit-learn](https://scikit-learn.org/)
+- [LightGBM](https://lightgbm.readthedocs.io/)
+- [XGBoost](https://xgboost.readthedocs.io/)
+- [CatBoost](https://catboost.ai/)
+- [Optuna](https://optuna.org/)
+- [Pydantic](https://pydantic-docs.helpmanual.io/)
 
-- **Issues**: [GitHub Issues](https://github.com/li147852xu/tabular-agent/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/li147852xu/tabular-agent/discussions)
-- **Email**: tabular-agent@example.com
+## 📞 支持
+
+- **问题报告**: [GitHub Issues](https://github.com/li147852xu/tabular-agent/issues)
+- **功能请求**: [GitHub Discussions](https://github.com/li147852xu/tabular-agent/discussions)
+- **文档**: [GitHub Wiki](https://github.com/li147852xu/tabular-agent/wiki)
 
 ---
 
-**Made with ❤️ by the Tabular Agent team**
+**Tabular Agent v1.0.0** - 让机器学习变得简单而可靠 🚀
