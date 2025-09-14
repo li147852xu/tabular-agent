@@ -101,7 +101,7 @@ class PlanningResult(BaseModel):
 class Planner:
     """Hybrid planner with LLM+rule fallback and strict schema validation."""
     
-    def __init__(self, config: PlanningConfig, knowledge_base: Optional['KnowledgeBase'] = None):
+    def __init__(self, config: PlanningConfig, knowledge_base: Optional[Any] = None):
         """Initialize planner."""
         self.config = config
         self.kb = knowledge_base

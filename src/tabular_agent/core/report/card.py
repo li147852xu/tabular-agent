@@ -108,8 +108,8 @@ class ModelCardGenerator:
                 plots['calibration'] = self._plot_calibration(calibration_results)
             
             # Feature Importance
-            if feature_importance:
-                plots['feature_importance'] = self._plot_feature_importance(feature_importance)
+            if 'feature_importance' in model_results and model_results['feature_importance']:
+                plots['feature_importance'] = self._plot_feature_importance(model_results['feature_importance'])
             
             # Data Distribution
             if data_profile:
