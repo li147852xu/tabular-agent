@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tabular-agent"
-version = "0.1.0"
+version = "0.2.0"
 description = "Automated tabular ML pipeline from CSV to model card reports"
 authors = [
     {name = "tabular-agent team", email = "tabular-agent@example.com"}
@@ -39,6 +39,7 @@ dependencies = [
     "tqdm>=4.60.0",
     "click>=8.0.0",
     "joblib>=1.1.0",
+    "pydantic>=1.10.0",
 ]
 
 [project.optional-dependencies]

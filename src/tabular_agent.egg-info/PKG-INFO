@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: tabular-agent
-Version: 0.1.0
+Version: 0.2.0
 Summary: Automated tabular ML pipeline from CSV to model card reports
 Author-email: tabular-agent team <tabular-agent@example.com>
 License: MIT
@@ -30,6 +30,7 @@ Requires-Dist: psutil>=5.8.0
 Requires-Dist: tqdm>=4.60.0
 Requires-Dist: click>=8.0.0
 Requires-Dist: joblib>=1.1.0
+Requires-Dist: pydantic>=1.10.0
 Provides-Extra: dev
 Requires-Dist: pytest>=6.0.0; extra == "dev"
 Requires-Dist: pytest-cov>=3.0.0; extra == "dev"

@@ -43,7 +43,8 @@ class ModelCardGenerator:
         feature_importance: Dict[str, float],
         calibration_results: Dict[str, Any],
         stability_results: Dict[str, Any],
-        metadata: Dict[str, Any]
+        metadata: Dict[str, Any],
+        planning_result: Optional[Dict[str, Any]] = None
     ) -> str:
         """
         Generate comprehensive model card.
@@ -68,7 +69,7 @@ class ModelCardGenerator:
         # Prepare data for template
         template_data = self._prepare_template_data(
             model_results, data_profile, audit_results, feature_importance,
-            calibration_results, stability_results, metadata, plots
+            calibration_results, stability_results, metadata, plots, planning_result
         )
         
         # Load and render template
@@ -379,7 +380,8 @@ class ModelCardGenerator:
         calibration_results: Dict[str, Any],
         stability_results: Dict[str, Any],
         metadata: Dict[str, Any],
-        plots: Dict[str, str]
+        plots: Dict[str, str],
+        planning_result: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """Prepare data for template rendering."""
         return {
@@ -391,8 +393,9 @@ class ModelCardGenerator:
             'stability_results': stability_results,
             'metadata': metadata,
             'plots': plots,
+            'planning_result': planning_result,
             'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'version': '0.1.0'
+            'version': '0.2.0'
         }
     
     def _load_template(self) -> Template:
@@ -622,6 +625,68 @@ class ModelCardGenerator:
             </div>
             {% endif %}
         </div>
+
+        <!-- Planning and Citations -->
+        {% if planning_result %}
+        <div class="section">
+            <h2>Planning and Citations</h2>
+            <div class="planning-info">
+                <h3>Execution Plan</h3>
+                <div class="plan-details">
+                    <p><strong>Planning Mode:</strong> {{ planning_result.mode_used|title }}</p>
+                    {% if planning_result.fallback_reason %}
+                    <div class="warning">
+                        <strong>⚠️ Fallback Applied:</strong> {{ planning_result.fallback_reason }}
+                    </div>
+                    {% endif %}
+                    
+                    <h4>Feature Engineering Recipes</h4>
+                    <ul>
+                        {% for recipe in planning_result.plan.feature_recipes %}
+                        <li>{{ recipe|replace('_', ' ')|title }}</li>
+                        {% endfor %}
+                    </ul>
+                    
+                    <h4>Model Types</h4>
+                    <ul>
+                        {% for model in planning_result.plan.model_types %}
+                        <li>{{ model|title }}</li>
+                        {% endfor %}
+                    </ul>
+                    
+                    <h4>Blending Strategy</h4>
+                    <p>{{ planning_result.plan.blending_strategy|replace('_', ' ')|title }}</p>
+                    
+                    {% if planning_result.plan.time_budget_allocation %}
+                    <h4>Time Budget Allocation</h4>
+                    <ul>
+                        {% for component, allocation in planning_result.plan.time_budget_allocation.items() %}
+                        <li>{{ component|replace('_', ' ')|title }}: {{ "%.1f"|format(allocation * 100) }}%</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+                
+                {% if planning_result.citations %}
+                <h3>Reference Citations</h3>
+                <div class="citations">
+                    <p>This plan was informed by {{ planning_result.citations|length }} similar prior runs:</p>
+                    {% for citation in planning_result.citations %}
+                    <div class="citation">
+                        <h4>Run {{ citation.run_id }}</h4>
+                        <p><strong>Similarity Score:</strong> {{ "%.3f"|format(citation.score) }}</p>
+                        <p><strong>Reason:</strong> {{ citation.reason }}</p>
+                        <details>
+                            <summary>Configuration Details</summary>
+                            <pre>{{ citation.config|tojson(indent=2) }}</pre>
+                        </details>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
 
         <!-- Leakage Audit -->
         <div class="section">

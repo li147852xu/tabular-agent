@@ -37,6 +37,9 @@ def cli():
 @click.option("--config", help="Path to configuration YAML file")
 @click.option("--seed", default=42, type=int, help="Random seed")
 @click.option("--verbose", "-v", is_flag=True, help="Verbose output")
+@click.option("--planner", default="auto", type=click.Choice(["llm", "rules", "auto"]), help="Planner mode")
+@click.option("--llm-endpoint", help="LLM endpoint URL")
+@click.option("--llm-key", help="LLM API key")
 def run(
     train: str,
     test: str,
@@ -49,6 +52,9 @@ def run(
     config: Optional[str],
     seed: int,
     verbose: bool,
+    planner: str,
+    llm_endpoint: Optional[str],
+    llm_key: Optional[str],
 ) -> None:
     """Run tabular-agent pipeline from CSV to model card report."""
     try:
@@ -78,7 +84,12 @@ def run(
         })
         
         # Initialize and run orchestrator
-        orchestrator = PipelineOrchestrator(config_dict)
+        orchestrator = PipelineOrchestrator(
+            config_dict, 
+            planner_mode=planner, 
+            llm_endpoint=llm_endpoint, 
+            llm_key=llm_key
+        )
         
         if verbose:
             click.echo(f"Starting tabular-agent pipeline...")

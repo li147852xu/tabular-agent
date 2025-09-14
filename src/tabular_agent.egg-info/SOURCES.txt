@@ -7,6 +7,11 @@ src/tabular_agent.egg-info/dependency_links.txt
 src/tabular_agent.egg-info/entry_points.txt
 src/tabular_agent.egg-info/requires.txt
 src/tabular_agent.egg-info/top_level.txt
+src/tabular_agent/agent/__init__.py
+src/tabular_agent/agent/planner.py
+src/tabular_agent/agent/kb/__init__.py
+src/tabular_agent/agent/kb/index.py
+src/tabular_agent/agent/kb/query.py
 src/tabular_agent/cli/__init__.py
 src/tabular_agent/cli/run.py
 src/tabular_agent/core/__init__.py
@@ -29,3 +34,5 @@ src/tabular_agent/core/report/card.py
 src/tabular_agent/core/tune/__init__.py
 src/tabular_agent/core/tune/optuna.py
 src/tabular_agent/examples/generate_example_data.py
+tests/test_kb_index.py
+tests/test_planner_guard.py

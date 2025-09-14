@@ -17,17 +17,21 @@ from .tune.optuna import OptunaTuner, MultiModelTuner
 from .blend.basic import BlendingEnsemble
 from .evaluate.metrics import MetricsCalculator, CalibrationAnalyzer, ThresholdOptimizer, StabilityAnalyzer
 from .report.card import ModelCardGenerator
+from ..agent import Planner, PlanningConfig, KnowledgeBase
 
 
 class PipelineOrchestrator:
     """Main orchestrator for the tabular-agent pipeline."""
     
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: Dict[str, Any], planner_mode: str = "auto", llm_endpoint: Optional[str] = None, llm_key: Optional[str] = None):
         """
         Initialize pipeline orchestrator.
         
         Args:
             config: Configuration dictionary
+            planner_mode: Planner mode (llm, rules, auto)
+            llm_endpoint: LLM endpoint URL
+            llm_key: LLM API key
         """
         self.config = config
         self.results = {}
@@ -35,6 +39,16 @@ class PipelineOrchestrator:
         # Set random seed
         if 'seed' in config:
             np.random.seed(config['seed'])
+        
+        # Initialize planner
+        self.planner_config = PlanningConfig(
+            mode=planner_mode,
+            llm_endpoint=llm_endpoint,
+            llm_key=llm_key
+        )
+        self.knowledge_base = KnowledgeBase()
+        self.planner = Planner(self.planner_config, self.knowledge_base)
+        self.planning_result = None
         
         # Initialize components
         self.data_profiler = None
@@ -65,6 +79,10 @@ class PipelineOrchestrator:
         start_time = time.time()
         
         try:
+            # Step 0: Index knowledge base and plan
+            print("Step 0: Indexing knowledge base and planning...")
+            self.knowledge_base.index_runs()
+            
             # Step 1: Load and profile data
             print("Step 1: Loading and profiling data...")
             train_df, train_metadata = self._load_and_profile_data(
@@ -78,6 +96,32 @@ class PipelineOrchestrator:
                 self.config['target'],
                 self.config.get('time_col')
             )
+            
+            # Generate plan based on data characteristics
+            print("Step 1.5: Generating execution plan...")
+            data_schema = {
+                'target': self.config['target'],
+                'time_col': self.config.get('time_col'),
+                'columns': train_metadata.get('columns', [])
+            }
+            
+            constraints = {
+                'time_budget': self.config.get('time_budget', 300),
+                'n_jobs': self.config.get('n_jobs', 1),
+                'memory_limit': self.config.get('memory_limit', None)
+            }
+            
+            self.planning_result = self.planner.plan(
+                data_schema, train_metadata, constraints
+            )
+            
+            if self.planning_result.success:
+                print(f"Planning successful using {self.planning_result.mode_used} mode")
+                if self.planning_result.citations:
+                    print(f"Found {len(self.planning_result.citations)} similar runs for reference")
+            else:
+                print(f"Planning failed: {self.planning_result.error_message}")
+                print("Falling back to default configuration")
             
             # Step 2: Leakage audit
             print("Step 2: Performing leakage audit...")
@@ -102,7 +146,7 @@ class PipelineOrchestrator:
             # Step 6: Generate model card
             print("Step 6: Generating model card...")
             model_card_path = self._generate_model_card(
-                evaluation_results, train_metadata, audit_results, output_dir
+                evaluation_results, train_metadata, audit_results, output_dir, self.planning_result
             )
             
             # Compile results
@@ -319,7 +363,8 @@ class PipelineOrchestrator:
         evaluation_results: Dict[str, Any], 
         train_metadata: Dict[str, Any], 
         audit_results: Dict[str, Any], 
-        output_dir: Path
+        output_dir: Path,
+        planning_result: Optional[Dict[str, Any]] = None
     ) -> str:
         """Generate model card."""
         # Get best model
@@ -348,7 +393,8 @@ class PipelineOrchestrator:
                 'n_jobs': self.config.get('n_jobs', 1),
                 'time_budget': self.config.get('time_budget', 300),
                 'seed': self.config.get('seed', 42)
-            }
+            },
+            planning_result=planning_result.dict() if planning_result else None
         )
         
         return model_card_path
