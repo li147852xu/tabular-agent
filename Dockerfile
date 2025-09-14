@@ -1,5 +1,5 @@
 # Use Python 3.11 slim image as base
-FROM python:3.11-slim
+FROM python:3.11-slim-buster
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
@@ -21,7 +21,7 @@ COPY pyproject.toml ./
 
 # Install Python dependencies
 RUN pip install --upgrade pip && \
-    pip install -e .
+    pip install -e .[all]
 
 # Copy source code
 COPY src/ ./src/
